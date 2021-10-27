@@ -1,4 +1,4 @@
--- DROP TABLE "Bill";
+DROP TABLE "Bill";
 
 CREATE TABLE "Bill"
 (
@@ -8,7 +8,7 @@ CREATE TABLE "Bill"
     "price"             DECIMAL  NOT NULL,
     "payment_confirmed" BOOLEAN  NOT NULL,
     PRIMARY KEY ("id_bill"),
-    FOREIGN KEY ("id_payment_method") REFERENCES paymentmethod ("id_payment_method")
+    FOREIGN KEY ("id_payment_method") REFERENCES PaymentMethod("id_payment_method")
 );
 
 CREATE TABLE "User"
