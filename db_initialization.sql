@@ -1,4 +1,10 @@
-DROP TABLE "Bill";
+-- DROP TABLE "Bill";
+-- todo
+-- add index, default value, required
+-- separate foreign keys from CREATE TABLE
+-- add testdata inserts
+-- add comments
+-- todo add author fields
 
 CREATE TABLE "Bill"
 (
