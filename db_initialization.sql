@@ -1,7 +1,6 @@
 -- DROP TABLE "Bill";
 -- todo
--- add index, default value, required
--- separate foreign keys from CREATE TABLE
+-- default value, required
 -- add testdata inserts
 -- add comments
 -- todo add author fields
@@ -304,3 +303,26 @@ CREATE TABLE "AvailableHours"
     PRIMARY KEY ("id_available_hours"),
     FOREIGN KEY ("id_tutoring") REFERENCES tutoring ("id_tutoring")
 );
+
+CREATE INDEX idx_id_payment_method ON PaymentMethod("id_payment_method");
+CREATE INDEX idx_id_role ON Role("id_role");
+CREATE INDEX idx_id_grade_level ON GradeLevel("id_grade_level");
+CREATE INDEX idx_id_contact ON Contact("id_contact");
+CREATE INDEX idx_id_rating ON Rating("id_rating");
+CREATE INDEX idx_id_user ON User("id_user");
+CREATE INDEX idx_id_tutoring_participant ON TutoringParticipant("id_tutoring_participant");
+CREATE INDEX idx_id_working_method ON WorkingMethod("id_working_method");
+CREATE INDEX idx_id_tutoring ON Tutoring("id_tutoring");
+CREATE INDEX idx_id_medium ON Medium("id_medium");
+CREATE INDEX idx_id_school_type ON SchoolType("id_school_type");
+CREATE INDEX idx_id_discount_rule ON DiscountRule("id_discount_rule");
+CREATE INDEX idx_id_timeslot ON Timeslot("id_timeslot");
+CREATE INDEX idx_id_bill ON Bill("id_bill");
+CREATE INDEX idx_id_special_need ON SpecialNeed("id_special_need");
+CREATE INDEX idx_id_timeslot_tutoring_participant ON Timeslot_TutoringParticipant("id_timeslot_tutoring_participant");
+CREATE INDEX idx_id_tutoring_scope ON TutoringScope("id_tutoring_scope");
+CREATE INDEX idx_id_subject ON Subject("id_subject");
+CREATE INDEX idx_id_book ON Book("id_book");
+CREATE INDEX idx_id_description ON Description("id_description");
+CREATE INDEX idx_id_timeslot_hide_rule ON TimeslotHideRule("id_timeslot_hide_rule");
+CREATE INDEX idx_id_attribute ON Attribute("id_attribute");
