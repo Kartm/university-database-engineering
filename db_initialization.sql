@@ -1,27 +1,24 @@
 -- DROP TABLE "Bill";
--- todo
--- default value, required
--- add testdata inserts
--- add comments
--- todo add author fields
 
+-- Time slot participation is paid with a Bill
 CREATE TABLE "Bill"
 (
     "id_bill"           SERIAL   NOT NULL,
     "id_payment_method" SERIAL   NOT NULL,
     "billed_at"         DATETIME NOT NULL,
     "price"             DECIMAL  NOT NULL,
-    "payment_confirmed" BOOLEAN  NOT NULL,
+    "payment_confirmed" BOOLEAN  NOT NULL, -- if paid with a bank transfer, Tutor has to manually confirm whether money has arrived
     PRIMARY KEY ("id_bill"),
     FOREIGN KEY ("id_payment_method") REFERENCES PaymentMethod("id_payment_method")
 );
 
+-- Account of Tutor or Participant
 CREATE TABLE "User"
 (
     "id_user"        SERIAL NOT NULL,
     "id_role"        SERIAL NOT NULL,
     "id_grade_level" SERIAL,
-    "id_contact"     SERIAL NOT NULL,
+    "id_contact"     SERIAL NOT NULL, -- contact info
     "first_name"     TEXT   NOT NULL,
     "last_name"      TEXT   NOT NULL,
     "date_of_birth"  DATETIME,
@@ -31,29 +28,32 @@ CREATE TABLE "User"
     FOREIGN KEY ("id_contact") REFERENCES contact ("id_contact")
 );
 
+-- Ratings on Tutoring can be disputed by Tutors
 CREATE TABLE "RatingDispute"
 (
     "id_rating_dispute" SERIAL  NOT NULL,
     "id_rating"         SERIAL  NOT NULL,
     "id_author"         SERIAL  NOT NULL,
     "reason"            TEXT    NOT NULL,
-    "is_reviewed"       BOOLEAN NOT NULL,
+    "is_reviewed"       BOOLEAN NOT NULL, -- admin will review, if reviewed then Rating is hidden
     PRIMARY KEY ("id_rating_dispute"),
     FOREIGN KEY ("id_rating") REFERENCES rating ("id_rating"),
     FOREIGN KEY ("id_author") REFERENCES user ("id_user")
 );
 
+-- Working method of a participant
 CREATE TABLE "TutoringParticipant_WorkingMethod"
 (
     "id_tutoring_participant_working_method" SERIAL  NOT NULL,
     "id_tutoring_participant"                SERIAL  NOT NULL,
     "id_working_method"                      SERIAL  NOT NULL,
-    "completed"                              BOOLEAN NOT NULL,
+    "completed"                              BOOLEAN NOT NULL, -- Tutor can mark whether a working method has been completed
     PRIMARY KEY ("id_tutoring_participant_working_method"),
     FOREIGN KEY ("id_tutoring_participant") REFERENCES tutoringparticipant ("id_tutoring_participant"),
     FOREIGN KEY ("id_working_method") REFERENCES workingmethod ("id_working_method")
 );
 
+-- User role
 CREATE TABLE "Role"
 (
     "id_role" SERIAL NOT NULL,
@@ -62,14 +62,16 @@ CREATE TABLE "Role"
     PRIMARY KEY ("id_role")
 );
 
+-- Timeslots can be hidden
 CREATE TABLE "TimeslotHideRule"
 (
     "id_timeslot_hide_rule"       SERIAL NOT NULL,
-    "total_income_threshold"      DECIMAL,
-    "taken_slots_ratio_threshold" DECIMAL,
+    "total_income_threshold"      DECIMAL, -- if set, hide any available slots if total income in a month has reached this
+    "taken_slots_ratio_threshold" DECIMAL, -- if set, hide any available slots if a ratio of taken slots has reached this
     PRIMARY KEY ("id_timeslot_hide_rule")
 );
 
+-- School subject, for example Mathematics
 CREATE TABLE "Subject"
 (
     "id_subject" SERIAL NOT NULL,
@@ -77,6 +79,7 @@ CREATE TABLE "Subject"
     PRIMARY KEY ("id_subject")
 );
 
+-- School type/level, for example Primary School
 CREATE TABLE "SchoolType"
 (
     "id_school_type" SERIAL NOT NULL,
@@ -84,6 +87,7 @@ CREATE TABLE "SchoolType"
     PRIMARY KEY ("id_school_type")
 );
 
+-- Tutoring medium, it can be "In person", "Discord"
 CREATE TABLE "Medium"
 (
     "id_medium"   SERIAL NOT NULL,
@@ -93,13 +97,16 @@ CREATE TABLE "Medium"
     PRIMARY KEY ("id_medium")
 );
 
+-- Bill can be paid some payment methods, for example with "Cash" or "Bank transfer"
 CREATE TABLE "PaymentMethod"
 (
     "id_payment_method" SERIAL NOT NULL,
     "name"              TEXT   NOT NULL,
+    "description"       TEXT   NOT NULL, -- holds details about the method, for example the bank account number
     PRIMARY KEY ("id_payment_method")
 );
 
+-- User who is attending some Tutoring classes
 CREATE TABLE "TutoringParticipant"
 (
     "id_tutoring_participant" SERIAL NOT NULL,
@@ -108,6 +115,7 @@ CREATE TABLE "TutoringParticipant"
     FOREIGN KEY ("id_user") REFERENCES user ("id_user")
 );
 
+--
 CREATE TABLE "DiscountRule"
 (
     "id_discount_rule" SERIAL NOT NULL,
@@ -138,6 +146,7 @@ CREATE TABLE "Rating"
     FOREIGN KEY ("id_tutoring") REFERENCES tutoring ("id_tutoring")
 );
 
+-- Description of a Tutoring class visible publicly
 CREATE TABLE "Description"
 (
     "id_description" SERIAL NOT NULL,
@@ -146,6 +155,7 @@ CREATE TABLE "Description"
     PRIMARY KEY ("id_description")
 );
 
+-- School grade of the Participant, for example "IV"
 CREATE TABLE "GradeLevel"
 (
     "id_grade_level" SERIAL NOT NULL,
@@ -166,6 +176,7 @@ CREATE TABLE "Contact"
     PRIMARY KEY ("id_contact")
 );
 
+-- The scope of the lessons. For example "Equalizing classes", "Extracurricular classes", "Along with the program"
 CREATE TABLE "TutoringScope"
 (
     "id_tutoring_scope" SERIAL NOT NULL,
@@ -173,6 +184,7 @@ CREATE TABLE "TutoringScope"
     PRIMARY KEY ("id_tutoring_scope")
 );
 
+-- Book that participant uses in school
 CREATE TABLE "Book"
 (
     "id_book" SERIAL NOT NULL,
@@ -181,6 +193,7 @@ CREATE TABLE "Book"
     PRIMARY KEY ("id_book")
 );
 
+-- Special educational need of a Participant
 CREATE TABLE "SpecialNeed"
 (
     "id_special_need" SERIAL NOT NULL,
@@ -188,20 +201,22 @@ CREATE TABLE "SpecialNeed"
     PRIMARY KEY ("id_special_need")
 );
 
+-- describes the discount and when it is available
 CREATE TABLE "Discount"
 (
     "id_discount"          SERIAL  NOT NULL,
     "id_tutoring"          SERIAL  NOT NULL,
     "id_discount_rule"     SERIAL  NOT NULL,
-    "new_price_multiplier" DECIMAL NOT NULL,
-    "due_date"             DATETIME,
-    "consumed_count"       INT     NOT NULL,
-    "max_consumed_count"   INT,
+    "new_price_multiplier" DECIMAL NOT NULL, -- for example 0.5 means a 50% discount
+    "due_date"             DATETIME, -- when does the Discount end? if NULL, then never
+    "consumed_count"       INT     NOT NULL, -- how many people used this Discount so far
+    "max_consumed_count"   INT, -- how many people can use this Discount? if NULL, then unlimited
     PRIMARY KEY ("id_discount"),
     FOREIGN KEY ("id_tutoring") REFERENCES tutoring ("id_tutoring"),
     FOREIGN KEY ("id_discount_rule") REFERENCES discountrule ("id_discount_rule")
 );
 
+-- a task for a Participant, for example "Kahoot quiz"
 CREATE TABLE "WorkingMethod"
 (
     "id_working_method" SERIAL NOT NULL,
@@ -209,6 +224,7 @@ CREATE TABLE "WorkingMethod"
     PRIMARY KEY ("id_working_method")
 );
 
+-- describes who has joined the timeslot and how was it paid
 CREATE TABLE "Timeslot_TutoringParticipant"
 (
     "id_timeslot_tutoring_participant" SERIAL NOT NULL,
@@ -221,6 +237,7 @@ CREATE TABLE "Timeslot_TutoringParticipant"
     FOREIGN KEY ("id_bill") REFERENCES bill ("id_bill")
 );
 
+-- Users can specify their special educational needs
 CREATE TABLE "User_SpecialNeed"
 (
     "id_user_special_need" SERIAL NOT NULL,
@@ -231,15 +248,17 @@ CREATE TABLE "User_SpecialNeed"
     FOREIGN KEY ("id_special_need") REFERENCES specialneed ("id_special_need")
 );
 
+-- Participants can cancel a Time Slot participation and free them up for others
 CREATE TABLE "Cancellation"
 (
     "id_cancellation"                  SERIAL  NOT NULL,
     "id_timeslot_tutoring_participant" SERIAL  NOT NULL,
-    "approved"                         BOOLEAN NOT NULL,
+    "approved"                         BOOLEAN NOT NULL, -- Tutor has to approve the cancellation
     PRIMARY KEY ("id_cancellation"),
     FOREIGN KEY ("id_timeslot_tutoring_participant") REFERENCES timeslot_tutoringparticipant ("id_timeslot_tutoring_participant")
 );
 
+-- Tutors can describe for example "Analytical skills" of a Participant
 CREATE TABLE "Attribute"
 (
     "id_attribute" SERIAL NOT NULL,
@@ -249,6 +268,7 @@ CREATE TABLE "Attribute"
     FOREIGN KEY ("id_author") REFERENCES user ("id_user")
 );
 
+-- Tutor can put a note on a Participant
 CREATE TABLE "TeachingNote"
 (
     "id_teaching_note"        SERIAL NOT NULL,
@@ -260,6 +280,7 @@ CREATE TABLE "TeachingNote"
     FOREIGN KEY ("id_tutoring_participant") REFERENCES tutoringparticipant ("id_tutoring_participant")
 );
 
+-- Holds information about Tutoring classes
 CREATE TABLE "Tutoring"
 (
     "id_tutoring"           SERIAL  NOT NULL,
@@ -269,10 +290,10 @@ CREATE TABLE "Tutoring"
     "id_book"               SERIAL,
     "id_description"        SERIAL  NOT NULL,
     "id_timeslot_hide_rule" SERIAL  NOT NULL,
-    "name"                  TEXT    NOT NULL,
-    "allow_gaps"            BOOLEAN NOT NULL,
-    "timeslot_mins"         INT     NOT NULL,
-    "price_for_timeslot"    INT     NOT NULL,
+    "name"                  TEXT    NOT NULL, -- name of the classes
+    "allow_gaps"            BOOLEAN NOT NULL, -- allow time windows between tutorings?
+    "timeslot_mins"         INT     NOT NULL, -- duration of a time slot in minutes
+    "price_for_timeslot"    INT     NOT NULL, -- price per timeslot
     PRIMARY KEY ("id_tutoring"),
     FOREIGN KEY ("id_teacher") REFERENCES user ("id_user"),
     FOREIGN KEY ("id_tutoring_scope") REFERENCES tutoringscope ("id_tutoring_scope"),
@@ -282,6 +303,7 @@ CREATE TABLE "Tutoring"
     FOREIGN KEY ("id_timeslot_hide_rule") REFERENCES timeslothiderule ("id_timeslot_hide_rule")
 );
 
+-- Assignment of an attribute to a participant
 CREATE TABLE "TutoringParticipant_Attribute"
 (
     "id_tutoring_participant_attribute" SERIAL NOT NULL,
@@ -293,6 +315,7 @@ CREATE TABLE "TutoringParticipant_Attribute"
     FOREIGN KEY ("id_attribute") REFERENCES attribute ("id_attribute")
 );
 
+-- Tutors can specify their available hours, Time Slots will be displayed based on them
 CREATE TABLE "AvailableHours"
 (
     "id_available_hours" SERIAL NOT NULL,
