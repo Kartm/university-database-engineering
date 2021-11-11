@@ -53,7 +53,7 @@ CREATE TABLE "TutoringParticipant_WorkingMethod"
     FOREIGN KEY ("id_working_method") REFERENCES workingmethod ("id_working_method")
 );
 
--- User role
+-- User's role
 CREATE TABLE "Role"
 (
     "id_role" SERIAL NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE "Role"
     PRIMARY KEY ("id_role")
 );
 
--- Timeslots can be hidden
+-- Available timeslots can be hidden from joining
 CREATE TABLE "TimeslotHideRule"
 (
     "id_timeslot_hide_rule"       SERIAL NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE "Medium"
     PRIMARY KEY ("id_medium")
 );
 
--- Bill can be paid some payment methods, for example with "Cash" or "Bank transfer"
+-- Bill can be paid with different payment methods, for example with "Cash" or "Bank transfer"
 CREATE TABLE "PaymentMethod"
 (
     "id_payment_method" SERIAL NOT NULL,
@@ -176,7 +176,7 @@ CREATE TABLE "Contact"
     PRIMARY KEY ("id_contact")
 );
 
--- The scope of the lessons. For example "Equalizing classes", "Extracurricular classes", "Along with the program"
+-- The scope of the classes. For example "Equalizing classes", "Extracurricular classes", "Along with the program"
 CREATE TABLE "TutoringScope"
 (
     "id_tutoring_scope" SERIAL NOT NULL,
@@ -184,7 +184,7 @@ CREATE TABLE "TutoringScope"
     PRIMARY KEY ("id_tutoring_scope")
 );
 
--- Book that participant uses in school
+-- Book that Participant uses in school
 CREATE TABLE "Book"
 (
     "id_book" SERIAL NOT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE "Discount"
     FOREIGN KEY ("id_discount_rule") REFERENCES discountrule ("id_discount_rule")
 );
 
--- a task for a Participant, for example "Kahoot quiz"
+-- a task for the Participant, for example "Kahoot quiz"
 CREATE TABLE "WorkingMethod"
 (
     "id_working_method" SERIAL NOT NULL,
@@ -262,7 +262,7 @@ CREATE TABLE "Cancellation"
 CREATE TABLE "Attribute"
 (
     "id_attribute" SERIAL NOT NULL,
-    "id_author"    SERIAL NOT NULL,
+    "id_author"    SERIAL NOT NULL, -- author user
     "name"         TEXT   NOT NULL,
     PRIMARY KEY ("id_attribute"),
     FOREIGN KEY ("id_author") REFERENCES user ("id_user")
